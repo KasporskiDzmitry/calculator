@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
+    <title>Calculator</title>
+</head>
+<body>
+<div class="container">
+    <div class="calculator-wrapper">
+        <div class="input-wrapper">
+            <div class="expression"></div>
+            <div class="input-area"></div>
+        </div>
+        <div class="buttons-wrapper">
+            <div class="btn-row">
+                <div class="btn action" data-action="open">(</div>
+                <div class="btn action" data-action="close">)</div>
+                <div class="btn action" data-action="remove"><</div>
+                <div class="btn action" data-action="clear">AC</div>
+            </div>
+            <div class="btn-row">
+                <div class="btn num">7</div>
+                <div class="btn num">8</div>
+                <div class="btn num">9</div>
+                <div class="btn action" data-action="div">&divide;</div>
+            </div>
+            <div class="btn-row">
+                <div class="btn num">4</div>
+                <div class="btn num">5</div>
+                <div class="btn num">6</div>
+                <div class="btn action" data-action="mult">&times;</div>
+            </div>
+            <div class="btn-row">
+                <div class="btn num">1</div>
+                <div class="btn num">2</div>
+                <div class="btn num">3</div>
+                <div class="btn action" data-action="minus">-</div>
+            </div>
+            <div class="btn-row">
+                <div class="btn num">0</div>
+                <div class="btn action" data-action="dot">.</div>
+                <div class="btn equal action" data-action="equal">=</div>
+                <div class="btn action" data-action="plus">+</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
