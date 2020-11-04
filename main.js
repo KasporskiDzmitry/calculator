@@ -1,10 +1,8 @@
 const inputWrapper = document.querySelector('.input-wrapper');
 const inputArea = document.querySelector('.input-area');
 const expressionArea = document.querySelector('.expression');
-
 const actions = {
-    OPERATIONS: {MINUS: 'minus', MULT: 'mult', DIV: 'div', PLUS: 'plus'},
-    DOT: 'dot',
+    SIGNS: ['minus', 'mult', 'div', 'dot', 'plus'],
     CLEAR: 'clear',
     REMOVE: 'remove',
     EQUAL: 'equal',
@@ -16,37 +14,19 @@ let isModified = false;
 let expression = '';
 let expressionModified = '';
 let currentPosition = 0;
+let ans = '';
 
 
 document.addEventListener("keydown", (event) => {
-    if (event.key >= 0 && event.key <= 9) {
-        isModified = true;
-        if (expression.length === 1 && expression.charAt(0) === '0' && event.key.match('[0-9]')) {
-            expression = expression.substr(0, expression.length-1);
-            currentPosition--;
-        }
-        expression += event.key;
-        currentPosition++;
-        inputArea.innerText = expression;
-    }
-
-    if (event.key === 'Enter') equal();
-    if (event.key.match('[\+\-\.\*\/]')) doMath(event.key);
-    if (event.key === 'Backspace') remove();
+    const key = event.key;
+    if (key.match('[0-9]')) digitInput(key);
+    if (key.match('[\+\-\.\*\/]')) doMath(key);
+    if (key === 'Enter') equal();
+    if (key === 'Backspace') remove();
 });
 
 document.querySelectorAll('.num').forEach(e => {
-    e.addEventListener('click', () => {
-        isModified = true;
-
-        if (expression.length === 1 && expression.charAt(0) === '0' && e.innerHTML.match('[0-9]')) {
-            expression = expression.substr(0, expression.length-1);
-            currentPosition--;
-        }
-        expression += e.innerHTML;
-        inputArea.innerText = expression;
-        currentPosition++;
-    })
+    e.addEventListener('click', () => digitInput(e.innerText))
 });
 
 document.querySelectorAll('.action').forEach(e => {
@@ -59,8 +39,8 @@ document.querySelectorAll('.action').forEach(e => {
             isModified = false;
             inputWrapper.childNodes.forEach(i => i.innerText = '');
             expression = '';
+            ans = '';
             currentPosition = 0;
-            return;
         }
 
         if (actionType === actions.REMOVE) {
@@ -72,17 +52,35 @@ document.querySelectorAll('.action').forEach(e => {
         }
 
         // math operations
-        if (actions.OPERATIONS.hasOwnProperty(actionType.toUpperCase()) || actionType === actions.DOT) {
+        if (actions.SIGNS.includes(actionType)) {
             doMath(currentSymbol);
         }
     })
 });
 
-function equal() {
-    // equal
-    isModified = false;
-    expressionModified = expression;
 
+// input digit
+function digitInput(digit) {
+    if (ans !== '' && !isModified) {
+        expression = '';
+        currentPosition = 0;
+        isModified = true;
+    }
+
+    if (expression.length === 1 && expression.charAt(0) === '0') {
+        expression = expression.substr(0, expression.length-1);
+        currentPosition--;
+    }
+
+    // expression += digit;
+    currentPosition++;
+    inputArea.innerText = expression += digit;
+}
+
+function equal() {
+    isModified = false;
+
+    expressionModified = expression;
     expressionModified = expressionModified.replaceAll('\u00D7', '*');
     expressionModified = expressionModified.replaceAll('\u00F7', '/');
 
@@ -90,14 +88,17 @@ function equal() {
 
     try {
         expression = toFixed(eval(expressionModified));
+        ans = expression;
+        currentPosition = expression.length;
+        if (expression.length > 12) {
+            expression = parseFloat(expression).toPrecision(7);
+        }
+        inputArea.innerText = expression;
         inputWrapper.classList.remove('error');
     } catch (e) {
+        inputArea.innerText = 'Error';
         inputWrapper.classList.add('error');
     }
-
-    currentPosition = expression.length;
-
-    return inputArea.innerText = expression;
 }
 
 function doMath(currentSymbol) {
@@ -117,15 +118,22 @@ function doMath(currentSymbol) {
         expression += currentSymbol;
     }
 
-    return inputArea.innerText = expression;
+    inputArea.innerText = expression;
 }
 
+
+// remove
 function remove() {
-    console.log(isModified)
     if (isModified) {
         expression = expression.substr(0, expression.length - 1);
         currentPosition--;
-        return inputArea.innerText = expression;
+        inputArea.innerText = expression;
+    } else {
+        isModified = false;
+        expressionArea.innerText = 'Ans = ' + ans;
+        expression = '';
+        currentPosition = 0;
+        inputArea.innerText = expression;
     }
 }
 
@@ -133,3 +141,6 @@ function toFixed(value) {
     var power = Math.pow(10, 10);
     return String(Math.round(value * power) / power);
 }
+
+
+
