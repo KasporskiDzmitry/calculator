@@ -16,7 +16,6 @@ let expressionModified = '';
 let currentPosition = 0;
 let ans = '';
 
-
 document.addEventListener("keydown", (event) => {
     const key = event.key;
     if (key.match('[0-9]')) digitInput(key);
@@ -61,11 +60,14 @@ document.querySelectorAll('.action').forEach(e => {
 
 // input digit
 function digitInput(digit) {
+    // if there are expression result
     if (ans !== '' && !isModified) {
         expression = '';
         currentPosition = 0;
-        isModified = true;
     }
+
+    isModified = true;
+
 
     if (expression.length === 1 && expression.charAt(0) === '0') {
         expression = expression.substr(0, expression.length-1);
@@ -96,6 +98,9 @@ function equal() {
         inputArea.innerText = expression;
         inputWrapper.classList.remove('error');
     } catch (e) {
+        expression = '';
+        expressionArea.innerText = 'Ans = ' + ans;
+        currentPosition = 0;
         inputArea.innerText = 'Error';
         inputWrapper.classList.add('error');
     }
@@ -105,6 +110,15 @@ function doMath(currentSymbol) {
     const lastSymbol = expression.charAt(currentPosition - 1);
     if (currentSymbol === '/') currentSymbol = '\u00F7';
     if (currentSymbol === '*') currentSymbol = '\u00D7';
+
+    if (currentSymbol === '.' && ans !== '' && !isModified) {
+        expression = '.';
+        inputArea.innerText = expression;
+        currentPosition = 1;
+        isModified = true;
+        return;
+    }
+
     isModified = true;
 
     if (lastSymbol.match('[0-9]')) {
@@ -124,6 +138,7 @@ function doMath(currentSymbol) {
 
 // remove
 function remove() {
+    console.log(isModified)
     if (isModified) {
         expression = expression.substr(0, expression.length - 1);
         currentPosition--;
