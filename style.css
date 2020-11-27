@@ -68,8 +68,13 @@
 
 
 
-.btn-row {
+.btn-row,
+.btn-col {
     display: flex;
+}
+
+.btn-col {
+    flex-direction: column;
 }
 
 .btn {
@@ -97,6 +102,10 @@
 
 .num:hover {
     background: gainsboro;
+}
+
+.equal {
+    height: 128px;
 }
 
 .equal,

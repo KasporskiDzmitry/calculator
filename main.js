@@ -12,14 +12,14 @@ const actions = {
 
 let isModified = false;
 let expression = '';
-let expressionModified = '';
+let expressionModified = expression;
 let currentPosition = 0;
 let ans = '';
 
 document.addEventListener("keydown", (event) => {
     const key = event.key;
     if (key.match('[0-9]')) digitInput(key);
-    if (key.match('[\+\-\.\*\/]')) doMath(key);
+    if (key.match('[+-.*/]')) doMath(key);
     if (key === 'Enter') equal();
     if (key === 'Backspace') remove();
 });
@@ -68,7 +68,6 @@ function digitInput(digit) {
 
     isModified = true;
 
-
     if (expression.length === 1 && expression.charAt(0) === '0') {
         expression = expression.substr(0, expression.length-1);
         currentPosition--;
@@ -81,6 +80,10 @@ function digitInput(digit) {
 
 function equal() {
     isModified = false;
+
+    if (expression === '') {
+        expression = '0';
+    }
 
     expressionModified = expression;
     expressionModified = expressionModified.replaceAll('\u00D7', '*');
@@ -111,6 +114,10 @@ function doMath(currentSymbol) {
     if (currentSymbol === '/') currentSymbol = '\u00F7';
     if (currentSymbol === '*') currentSymbol = '\u00D7';
 
+    if (currentSymbol === ',') {
+        currentSymbol = '.';
+    }
+
     if (currentSymbol === '.' && ans !== '' && !isModified) {
         expression = '.';
         inputArea.innerText = expression;
@@ -132,13 +139,16 @@ function doMath(currentSymbol) {
         expression += currentSymbol;
     }
 
+    if (currentSymbol === '.' && !/^(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[-+\u00F7\u00D7]|$))+$/.test(expression)) {
+        expression = expression.substr(0, expression.length - 1);
+        currentPosition--;
+    }
+
     inputArea.innerText = expression;
 }
 
-
 // remove
 function remove() {
-    console.log(isModified)
     if (isModified) {
         expression = expression.substr(0, expression.length - 1);
         currentPosition--;
