@@ -1,6 +1,7 @@
 const inputWrapper = document.querySelector('.input-wrapper');
 const inputArea = document.querySelector('.input-area');
 const expressionArea = document.querySelector('.expression');
+
 const actions = {
     SIGNS: ['minus', 'mult', 'div', 'dot', 'plus'],
     CLEAR: 'clear',
@@ -10,162 +11,124 @@ const actions = {
     CLOSE: 'close'
 };
 
-let isModified = false;
-let expression = '';
+let isModifiedNow = true;
+let expression = '0';
 let expressionModified = expression;
-let currentPosition = 0;
-let ans = '';
+let currentPosition = 1;
 
 document.addEventListener("keydown", (event) => {
     const key = event.key;
-    if (key.match('[0-9]')) digitInput(key);
-    if (key.match('[+-.*/]')) doMath(key);
-    if (key === 'Enter') equal();
+    if (key.match('[0-9]')) printDigit(key);
+    if (key.match('[+-.*/]')) printSign(key);
+    if (key === 'Enter') solve();
     if (key === 'Backspace') remove();
 });
 
 document.querySelectorAll('.num').forEach(e => {
-    e.addEventListener('click', () => digitInput(e.innerText))
+    e.addEventListener('click', () => printDigit(e.innerText))
 });
 
 document.querySelectorAll('.action').forEach(e => {
     e.addEventListener('click', () => {
         const actionType = e.dataset.action;
-        const currentSymbol = e.innerHTML;
 
-        // clear all
-        if (actionType === actions.CLEAR) {
-            isModified = false;
-            inputWrapper.childNodes.forEach(i => i.innerText = '');
-            expression = '';
-            ans = '';
-            currentPosition = 0;
-        }
-
-        if (actionType === actions.REMOVE) {
-            remove();
-        }
-
-        if (actionType === actions.EQUAL) {
-            equal();
-        }
-
-        // math operations
-        if (actions.SIGNS.includes(actionType)) {
-            doMath(currentSymbol);
-        }
+        if (actionType === actions.CLEAR) clear();
+        if (actionType === actions.REMOVE) remove();
+        if (actionType === actions.EQUAL) solve();
+        if (actions.SIGNS.includes(actionType)) printSign(e.innerHTML);
     })
 });
 
-
-// input digit
-function digitInput(digit) {
+function printDigit(digit) {
     // if there are expression result
-    if (ans !== '' && !isModified) {
+    if (!isModifiedNow) {
         expression = '';
         currentPosition = 0;
     }
 
-    isModified = true;
-
+    // if first digit is zero
     if (expression.length === 1 && expression.charAt(0) === '0') {
-        expression = expression.substr(0, expression.length-1);
-        currentPosition--;
+        removeLastSymbol();
     }
 
-    // expression += digit;
+    isModifiedNow = true;
     currentPosition++;
     inputArea.innerText = expression += digit;
 }
 
-function equal() {
-    isModified = false;
+function solve() {
+    isModifiedNow = false;
 
-    if (expression === '') {
-        expression = '0';
-    }
+    expressionArea.innerText = expression + '=';
 
     expressionModified = expression;
     expressionModified = expressionModified.replaceAll('\u00D7', '*');
     expressionModified = expressionModified.replaceAll('\u00F7', '/');
 
-    expressionArea.innerText = expression + '=';
-
     try {
         expression = toFixed(eval(expressionModified));
-        ans = expression;
-        currentPosition = expression.length;
+
         if (expression.length > 12) {
             expression = parseFloat(expression).toPrecision(7);
         }
+
+        currentPosition = expression.length;
         inputArea.innerText = expression;
         inputWrapper.classList.remove('error');
     } catch (e) {
-        expression = '';
-        expressionArea.innerText = 'Ans = ' + ans;
-        currentPosition = 0;
+        clear();
         inputArea.innerText = 'Error';
         inputWrapper.classList.add('error');
     }
 }
 
-function doMath(currentSymbol) {
-    const lastSymbol = expression.charAt(currentPosition - 1);
+function printSign(currentSymbol) {
     if (currentSymbol === '/') currentSymbol = '\u00F7';
     if (currentSymbol === '*') currentSymbol = '\u00D7';
+    if (currentSymbol === ',') currentSymbol = '.';
 
-    if (currentSymbol === ',') {
-        currentSymbol = '.';
-    }
-
-    if (currentSymbol === '.' && ans !== '' && !isModified) {
-        expression = '.';
-        inputArea.innerText = expression;
+    if (currentSymbol === '.' && !isModifiedNow) {
+        inputArea.innerText = expression = '.';
         currentPosition = 1;
-        isModified = true;
+        isModifiedNow = true;
         return;
     }
 
-    isModified = true;
+    isModifiedNow = true;
 
-    if (lastSymbol.match('[0-9]')) {
-        expression += currentSymbol;
-        currentPosition++;
-    } else if (currentPosition === 0 && currentSymbol.match('[\+\-\.\u00D7\u00F7]')) {
-        expression += '0' + currentSymbol;
-        currentPosition = 2;
-    } else {
-        expression = expression.substr(0, expression.length - 1); // replace operation
-        expression += currentSymbol;
+    if (!(expression.charAt(currentPosition - 1)).match('[0-9]')) {
+        removeLastSymbol();
     }
 
+    expression += currentSymbol;
+    currentPosition++;
+
+    // removing extra dot if needed
     if (currentSymbol === '.' && !/^(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[-+\u00F7\u00D7]|$))+$/.test(expression)) {
-        expression = expression.substr(0, expression.length - 1);
-        currentPosition--;
+        removeLastSymbol();
     }
 
     inputArea.innerText = expression;
 }
 
-// remove
+function clear() {
+    isModifiedNow = false;
+    inputWrapper.childNodes.forEach(i => i.innerText = '');
+    expression = '0';
+    currentPosition = 1;
+}
+
 function remove() {
-    if (isModified) {
-        expression = expression.substr(0, expression.length - 1);
-        currentPosition--;
-        inputArea.innerText = expression;
-    } else {
-        isModified = false;
-        expressionArea.innerText = 'Ans = ' + ans;
-        expression = '';
-        currentPosition = 0;
-        inputArea.innerText = expression;
-    }
+    isModifiedNow ? removeLastSymbol() : clear();
+    inputArea.innerText = expression;
+}
+
+function removeLastSymbol() {
+    expression = expression.substr(0, expression.length-1);
+    currentPosition--;
 }
 
 function toFixed(value) {
-    var power = Math.pow(10, 10);
+    const power = Math.pow(10, 10);
     return String(Math.round(value * power) / power);
 }
-
-
-

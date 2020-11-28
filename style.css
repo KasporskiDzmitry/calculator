@@ -1,11 +1,12 @@
 * {
     box-sizing: border-box;
+    transition: .2s;
+    border-radius: 10px;
 }
 
 .calculator-wrapper {
     border: 1px solid lightgray;
     background: floralwhite;
-    border-radius: 10px;
     margin: 100px auto;
     padding: 20px;
     width: 400px;
@@ -21,30 +22,17 @@
     margin-left: 2px;
     margin-right: 2px;
     margin-bottom: 10px;
-    border-radius: 10px;
     background: white;
     position: relative;
     overflow: hidden;
-    transition: .2s;
-}
-
-.error {
-    border: 1px solid red;
 }
 
 .input-wrapper:hover {
     border: 1px solid darkgray;
 }
 
-.expression {
-    margin: 0 5px;
-    height: 20px;
-    padding: 5px;
-    position: absolute;
-    right: 0;
-    transition: .3s;
-    white-space: nowrap;
-    overflow: hidden;
+.error {
+    border: 1px solid red;
 }
 
 .input-area {
@@ -53,20 +41,23 @@
     right: 0;
     bottom: 0;
     padding: 0;
-    /*margin: 0 5px;*/
-    /*width: 98%;*/
+    margin: 0 15px;
     height: 50%;
-    caret-color: transparent;
     font-size: 32px;
     font-weight: bold;
-    outline: none;
     text-align: right;
-    overflow-x: hidden;
-    /*overflow-y: hidden;*/
     white-space: nowrap;
 }
 
-
+.expression {
+    margin: 0 5px;
+    height: 20px;
+    padding: 5px;
+    position: absolute;
+    right: 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
 
 .btn-row,
 .btn-col {
@@ -86,12 +77,11 @@
     align-items: center;
     background: gainsboro;
     font-size: 22px;
-    border-radius: 5px;
     cursor: pointer;
-    transition: .2s;
 }
 
-.btn:active {
+.btn:active,
+.btn:focus {
     border: 1px solid gray;
 }
 
@@ -106,41 +96,18 @@
 
 .equal {
     height: 128px;
-}
-
-.equal,
-.equal:hover {
-    color: white;
     background: royalblue;
 }
 
+.equal:hover {
+    background: rebeccapurple;
+}
+
+.clear,
+.clear:hover {
+    background: darkgray;
+}
+
 .action {
-    font-size: 22px;
     font-weight: bold;
 }
-
-.rad-deg-toggle {
-    display: flex;
-    width: 208px;
-}
-
-.toggled {
-    color: gray;
-}
-
-.rad,
-.deg {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.deg {
-    border-left: 1px solid darkgray;
-}
-
-.rad {
-    border-right: 1px solid darkgray;
-}
-
